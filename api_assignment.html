@@ -40,8 +40,8 @@
     </div>
 
     <div id="capCard" class="alert row  " role="alert">
-        <div class="col-2"><img id="imgSnap" src="" width="100" class="mr-2" /></div>
-        <div class="col-10 pl-4"><h4 class="alert-heading">Total Crypto Market change over the past 7 days. <span id="marketChange"></span></h4>
+        <div class="col-3"><img id="imgSnap" src="" class="mr-2 img-fluid" /></div>
+        <div class="col-9 pl-4"><h4 class="alert-heading">Total Crypto Market change over the past 7 days. <span id="marketChange"></span></h4>
             <hr>
             <p id="cuteMsg"></p>
         </div>
@@ -99,7 +99,7 @@
 
                                 if (logging){
                                     // Logging
-                                    //console.log("Page: " + p);
+                                    console.log("Page: " + p);
                                     console.log("Coin: " + data[i].id);
                                     //console.log("Current price:" + curPrice);
                                     //console.log("Current supply:" + curSupply);
@@ -110,32 +110,32 @@
                                 } // logging section
                             } // loop through all coins on page
 
-                            
+                            marketChange = -1 * ((currentCap - previousCap)).toFixed(2) + " billion dollars.";
+                            $("#marketChange").html(marketChange);
+                            console.log("Total Coins Parsed: " + coins);
+                            //  marketChange = ((currentCap - previousCap) / 1000000000000).toFixed(2) + " billion dollars.";
+                            //  $("#marketChange").html(marketChange);
+                            if (previousCap > currentCap) { //loss
+                                $("#capCard").addClass(" alert-danger");
+                                $("#cuteMsg").html("Sorry to the bag holders.");
+                                let loc = "https://www.hardforking.com/file/2017/12/sad-bitcoin-1024x568.jpg";
+                                $("#imgSnap").attr("src",loc);
+
+                            } else { //gain
+                                $("#capCard").addClass(" alert-success");
+                                $("#cuteMsg").html("Excellent - congrats to the winners. So much Hopium!");
+                                let loc = "https://lh3.googleusercontent.com/pw/ACtC-3fmAhA_TBTEglkFqrxt03Kc6R8lKmmNDb5ptKBWUFP0-4NpTaxuXt1VfaCGlIzWnxj6cbA8g6bRAwJz6NwZJA0EHDsi8GDrEuOc_oS7oML1mulxlV11oX2E61D_QemZVJnyhIvbBCgk0ma2oSFQGQlO8w=w495-h496-no?authuser=0";
+                                $("#imgSnap").attr("src",loc);
+                            }
                         }) // fetching each coin
+                      
                     }) // pull response from allcoins
+
                 } // fetching each page of the market
                 
            
-            })
-    
-          
-            marketChange = -1 * ((currentCap - previousCap)).toFixed(2) + " billion dollars.";
-            $("#marketChange").html(marketChange);
-            console.log("Total Coins Parsed: " + coins);
-            //  marketChange = ((currentCap - previousCap) / 1000000000000).toFixed(2) + " billion dollars.";
-            //  $("#marketChange").html(marketChange);
-            if (previousCap > currentCap) { //loss
-                $("#capCard").addClass(" alert-danger");
-                $("#cuteMsg").html("Sorry to the bag holders.");
-                $("#imgSnap").attr("src","https://www.hardforking.com/file/2017/12/sad-bitcoin-1024x568.jpg");
+           })
 
-            } else { //gain
-                $("#capCard").addClass(" alert-success");
-                $("#cuteMsg").html("Excellent - congrats to the winners. So much Hopium!");
-                let loc = "https://lh3.googleusercontent.com/pw/ACtC-3fmAhA_TBTEglkFqrxt03Kc6R8lKmmNDb5ptKBWUFP0-4NpTaxuXt1VfaCGlIzWnxj6cbA8g6bRAwJz6NwZJA0EHDsi8GDrEuOc_oS7oML1mulxlV11oX2E61D_QemZVJnyhIvbBCgk0ma2oSFQGQlO8w=w495-h496-no?authuser=0";
-                // let loc= "https://www.facebook.com/ivanontech/photos/a.334285627012528/428502814257475/?type=3&eid=ARBdAneZb4JdiEpsMqztjOEtP9aiqQMl48OZS0L3nKBdRztYU8-N_MaqK8BhxLon0cWQrKr2JOrYsLyV&__xts__%5B0%5D=68.ARBHhdy029F-MX9dbti65z-hGkRHACjwLFcYLu4Na3cGXTO5WiWorbr4ReHRZyg3V_dhUTsJZzwcB3wWlm2GZkXwZVOP4tsLO9O6OptHdSi9A1poscQLjVZFFs5bpLAE2RPVdX_82brsQh2L4wOCoeGVLKo6nIP4hydQ5uXwb5tk-iC4qhh0ESppDCxvep29xH-gA-Ms4dTN1TwqEynZIV4XUMO357RydGnD74tTjPOblQ6lj6GZ7g0PLNrFHU_YVhwuS1FigRMDgXGYeRZSTxWoBfhCrpbzAclYWRrWV7OlckFwyYBL6SEuxzGybL-zC8-mTbloHd6ZsnP--c3_YhY&__tn__=EEHH-R"
-                $("#imgSnap").attr("src",loc);
-            }
 
             });
             }
