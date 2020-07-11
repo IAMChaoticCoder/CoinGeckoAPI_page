@@ -1,0 +1,123 @@
+<html>
+<head>
+    <title>Matt's API Assignment</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <style>
+        html, body, h1, h2, h3, h4, h5, h6 {
+            font-family: 'Roboto', sans-serif;
+        }
+        /* just a bit of padding for whitespace */
+        body {
+            padding: 3em;
+        }
+
+    </style>
+
+
+</head>
+<body>
+  
+    <div class="row pb-5"><h1 class="mx-auto">Matt's API Assignment</h1></div>
+
+    <div id="capcard" class="alert alert-success" role="alert">
+        <h4 class="alert-heading">Total Crypto Market change over the past 7 days. (<span id="marketChange"></span>) </h4>
+        <hr>
+        <p id="cuteMsg"></p>
+        
+
+    </div>
+
+
+<script>
+
+    let BASE_URL = "https://api.coingecko.com/api/v3/";
+    //  "/simple/price?ids=bitcoin&vs_currencies=usd";
+    let FULL_ENDPOINT = "/coins/markets?vs_currency=USD&order=market_cap_desc&per_page=255&page=1&sparkline=false&price_change_percentage=7d";
+
+    //let url = BASE_URL + ENDPOINT;
+    let allCoinsUrl = BASE_URL + COINS_ENDPOINT;
+
+    var ttlPast = 0;
+    var ttlCurrent = 1;
+
+    fetch("https://httpbin.org/post",{
+        method:"post",
+        body:JSON.stringify({secret1:"stuff", sensitive:"sensitive"
+        })
+
+    })
+
+    .then(res => {
+        
+        res.json().then(data => {
+            
+            console.log(data.bitcoin.usd);
+            $("#marketChange").html(marketChange);
+        })
+
+    })
+    .catch(err => {
+        $("#price").html("Bitcoin price is "+err);
+    })
+
+
+    if (ttlPast < ttlCurrent){
+        $( "#capcard" ).addClass( "alert-danger" );
+    }else{
+        $( "#capcard" ).addClass( "alert-success" );
+    }
+
+
+/* loss 
+add class alert-danger to id of capcard
+change in id="marketChange"
+cuteMsg = Sorry to the bag holders.
+
+gain 
+add class alert-success to id of capcard
+change in id="marketChange"
+cuteMsg = Excellent - congrats to the winners.
+
+
+*/
+
+</script>
+
+<!-- <div><h5>Assignment Rubric</h5>
+
+Display the 7 day change in total crypto marketcap
+
+Make sure that the text is colored green if the change is positive and red if the change is negative.
+
+</div>
+
+<div><h5>Plan</h5>
+    Use the markets api call in USD, no order needed, but loop through the 7 day aggregate market cap. 
+        /coins/markets
+        List all supported coins price, market cap, volume, and market related data
+        Use this to obtain all the coins market data (price, market cap, volume)
+    
+    PARAMS
+    per_page = 1000
+    price_change_percentage 7d
+
+curl -X GET "https://api.coingecko.com/api/v3/coins/markets?vs_currency=USD&order=market_cap_desc&per_page=1000&page=1&sparkline=false&price_change_percentage=7d" -H "accept: application/json"
+
+https://api.coingecko.com/api/v3/coins/markets?vs_currency=USD&order=market_cap_desc&per_page=1000&page=1&sparkline=false&price_change_percentage=7d
+
+</div> -->
+
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    
+</body>
+
+</html>
+

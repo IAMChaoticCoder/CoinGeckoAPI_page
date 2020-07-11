@@ -1,0 +1,195 @@
+<html>
+
+<head>
+    <title>Matt's API Assignment</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+    </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+
+
+    <style>
+        html,body,h1,h2,h3,h4,h5,h6 {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* just a bit of padding for whitespace */
+        body {
+            padding: 3em;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+    <div class="row pb-5">
+        <h1 class="mx-auto">Matt's API Assignment</h1>
+    </div>
+
+    <div id="capCard" class="alert row  " role="alert">
+        <div class="col-2"><img id="imgSnap" src="" width="100" class="mr-2" /></div>
+        <div class="col-10 pl-4"><h4 class="alert-heading">Total Crypto Market change over the past 7 days. <span id="marketChange"></span></h4>
+            <hr>
+            <p id="cuteMsg"></p>
+        </div>
+    </div>
+
+
+    <script>
+
+        const logging = true;
+        var previousCap = 0;
+        var currentCap = 0;
+        var pages = 0;
+        var BASE_URL = "https://api.coingecko.com/api/v3/";
+        var COINS = "coins/list";
+        var MKT_ENDPOINT =  "/coins/markets?vs_currency=USD&order=market_cap_desc&per_page=250&sparkline=false&price_change_percentage=7d&page=";
+
+        var coinCountURL = BASE_URL + COINS;
+        var allCoinsUrl = BASE_URL + MKT_ENDPOINT;
+        
+        $(document).ready(function () {
+        fetch(coinCountURL) // fetch all coins for page count using 250 per    
+        
+        .then(
+            res => {
+
+            res.json().then(data => { // old method     response.json().then(function(data) {
+                if (res.status !== 200) {
+                console.log('Looks like CoinGecko is down - Have Ivan run a stream. =) Status Code: ' +
+                response.status);
+                return;
+            }
+            // else all is good - continue
+                pages = Math.round(data.length / 250);
+                console.log("Total pages => " + pages);
+                console.log(data);
+                var coins = 0;
+                for (p = 1; p <= pages; p++) {
+                
+                // console.log("Page: " + p);
+                fetch(allCoinsUrl + p) // fetch market data 
+                    .then(res => {
+
+                        res.json().then(data => {
+
+                            for (i = 0; i < data.length; i++) {
+                                coins ++;
+
+                                let curPrice = data[i].current_price;
+                                let curSupply = data[i].circulating_supply;
+                                let change = (data[i].price_change_percentage_7d_in_currency/100)+1;
+
+                                currentCap += data[i].market_cap; //add coin cap to full market cap
+
+                                previousCap += (data[i].market_cap / 1+ ((data[i].price_change_percentage_7d_in_currency/100)) ); //add coin cap difference
+
+                                if (logging){
+                                    // Logging
+                                    //console.log("Page: " + p);
+                                    console.log("Coin: " + data[i].id);
+                                    //console.log("Current price:" + curPrice);
+                                    //console.log("Current supply:" + curSupply);
+                                
+                                    console.log("Current Cap: " + currentCap);
+                                    console.log("Prev Cap :" + previousCap);
+                                    
+                                } // logging section
+                            } // loop through all coins on page
+
+                            
+                        }) // fetching each coin
+                    }) // pull response from allcoins
+                } // fetching each page of the market
+                
+           
+            })
+    
+          
+            marketChange = -1 * ((currentCap - previousCap)).toFixed(2) + " billion dollars.";
+            $("#marketChange").html(marketChange);
+            console.log("Total Coins Parsed: " + coins);
+            //  marketChange = ((currentCap - previousCap) / 1000000000000).toFixed(2) + " billion dollars.";
+            //  $("#marketChange").html(marketChange);
+            if (previousCap > currentCap) { //loss
+                $("#capCard").addClass(" alert-danger");
+                $("#cuteMsg").html("Sorry to the bag holders.");
+                $("#imgSnap").attr("src","https://www.hardforking.com/file/2017/12/sad-bitcoin-1024x568.jpg");
+
+            } else { //gain
+                $("#capCard").addClass(" alert-success");
+                $("#cuteMsg").html("Excellent - congrats to the winners. So much Hopium!");
+                let loc = "https://lh3.googleusercontent.com/pw/ACtC-3fmAhA_TBTEglkFqrxt03Kc6R8lKmmNDb5ptKBWUFP0-4NpTaxuXt1VfaCGlIzWnxj6cbA8g6bRAwJz6NwZJA0EHDsi8GDrEuOc_oS7oML1mulxlV11oX2E61D_QemZVJnyhIvbBCgk0ma2oSFQGQlO8w=w495-h496-no?authuser=0";
+                // let loc= "https://www.facebook.com/ivanontech/photos/a.334285627012528/428502814257475/?type=3&eid=ARBdAneZb4JdiEpsMqztjOEtP9aiqQMl48OZS0L3nKBdRztYU8-N_MaqK8BhxLon0cWQrKr2JOrYsLyV&__xts__%5B0%5D=68.ARBHhdy029F-MX9dbti65z-hGkRHACjwLFcYLu4Na3cGXTO5WiWorbr4ReHRZyg3V_dhUTsJZzwcB3wWlm2GZkXwZVOP4tsLO9O6OptHdSi9A1poscQLjVZFFs5bpLAE2RPVdX_82brsQh2L4wOCoeGVLKo6nIP4hydQ5uXwb5tk-iC4qhh0ESppDCxvep29xH-gA-Ms4dTN1TwqEynZIV4XUMO357RydGnD74tTjPOblQ6lj6GZ7g0PLNrFHU_YVhwuS1FigRMDgXGYeRZSTxWoBfhCrpbzAclYWRrWV7OlckFwyYBL6SEuxzGybL-zC8-mTbloHd6ZsnP--c3_YhY&__tn__=EEHH-R"
+                $("#imgSnap").attr("src",loc);
+            }
+
+            });
+            }
+        )
+       
+
+
+    
+        /*
+        //==================================================================================================================================
+        // RUBRIC
+        //==================================================================================================================================
+            Display the 7 day change in total crypto marketcap
+            Make sure that the text is colored green if the change is positive and red if the change is negative.
+
+        //==================================================================================================================================
+        // PLAN
+        //==================================================================================================================================
+            Use the markets api call in USD, no order needed, but loop through the 7 day aggregate market cap. 
+
+            per_page = 250
+            price_change_percentage 7d
+
+        curl -X GET "https://api.coingecko.com/api/v3/coins/markets?vs_currency=USD&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=7d" -H "accept: application/json"
+
+        https://api.coingecko.com/api/v3/coins/markets?vs_currency=USD&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=7d
+
+
+
+        //  market_cap: - add to currentCap
+        //  (price *  price_change_percentage_7d_in_currency) * supply
+        //  calculate previous price - add to previousCap
+
+        // BTC example
+        /*
+        $9,208.93
+        18,430,031
+        $169,720,916,331
+        1.5162813758547298 %
+        0.015162813758547298
+        Diff = $2,649,096,490.915086
+
+        $ 275,732,711,506.2394
+        $ 275,732,714,600.84
+
+        NOMICS $275.91B 3.71% (7d())
+        CMC 270.4B 
+
+        $27,6244,149,057.3995
+  
+        */
+    </script>
+
+
+</body>
+
+</html>
