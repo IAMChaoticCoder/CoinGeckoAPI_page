@@ -50,7 +50,6 @@
 
     <script>
 
-        const logging = true;
         var previousCap = 0;
         var currentCap = 0;
         var pages = 0;
@@ -60,14 +59,15 @@
 
         var coinCountURL = BASE_URL + COINS;
         var allCoinsUrl = BASE_URL + MKT_ENDPOINT;
-        
+        var coins = 0;
+
         $(document).ready(function () {
         fetch(coinCountURL) // fetch all coins for page count using 250 per    
         
         .then(
             res => {
 
-            res.json().then(data => { // old method     response.json().then(function(data) {
+            res.json().then(data => { 
                 if (res.status !== 200) {
                 console.log('Looks like CoinGecko is down - Have Ivan run a stream. =) Status Code: ' +
                 response.status);
@@ -76,72 +76,65 @@
             // else all is good - continue
                 pages = Math.round(data.length / 250);
                 console.log("Total pages => " + pages);
-                console.log(data);
-                var coins = 0;
+                
+
                 for (p = 1; p <= pages; p++) {
+                   // console.log("Page: " + p);
                 
-                // console.log("Page: " + p);
-                fetch(allCoinsUrl + p) // fetch market data 
-                    .then(res => {
+                    fetch(allCoinsUrl + p) // fetch market data 
+                        .then(res => {
 
-                        res.json().then(data => {
-
-                            for (i = 0; i < data.length; i++) {
-                                coins ++;
-
-                                let curPrice = data[i].current_price;
-                                let curSupply = data[i].circulating_supply;
-                                let change = (data[i].price_change_percentage_7d_in_currency/100)+1;
-
-                                currentCap += data[i].market_cap; //add coin cap to full market cap
-
-                                previousCap += (data[i].market_cap / 1+ ((data[i].price_change_percentage_7d_in_currency/100)) ); //add coin cap difference
-
-                                if (logging){
-                                    // Logging
-                                    console.log("Page: " + p);
-                                    console.log("Coin: " + data[i].id);
-                                    //console.log("Current price:" + curPrice);
-                                    //console.log("Current supply:" + curSupply);
-                                
-                                    console.log("Current Cap: " + currentCap);
-                                    console.log("Prev Cap :" + previousCap);
+                            res.json().then(data => {
+                                console.log(data);                
+                                for (i = 0; i < data.length; i++) {
+                                    coins ++;
                                     
-                                } // logging section
-                            } // loop through all coins on page
+                                    if ((data[i].market_cap !== null) && (data[i].market_cap !== 0))  { // only bother with coins with market cap
+                                        currentCap += data[i].market_cap; //add coin cap to full market cap
+                                        if (data[i].price_change_percentage_7d_in_currency != "null"){
+                                            previousCap += (data[i].market_cap / (data[i].price_change_percentage_7d_in_currency/100) ); //add coin cap difference
+                                            console.log(data[i].id + "( Cap )" + data[i].market_cap + " (change) " + (data[i].price_change_percentage_7d_in_currency/100) );
+                                        } else {
+                                            previousCap += data[i].marketcap
+                                        }
+                                        
+                                    }
+                                } // loop through all coins on page
+                               
+                              //  console.log("Total Coins Parsed: " + coins);
+                               // console.log("currentCap: " + currentCap);
+                              //  console.log("previousCap: " + previousCap);
+                                
+                                marketChange = ((currentCap - previousCap) / 1000000000000).toFixed(2) + " billion dollars.";
+                                $("#marketChange").html(marketChange);
+                                
+                                if (previousCap > currentCap) { //loss
+                                    $("#capCard").addClass(" alert-danger");
+                                    $("#cuteMsg").html("Sorry to the bag holders.");
+                                    let loc = "https://www.hardforking.com/file/2017/12/sad-bitcoin-1024x568.jpg";
+                                    $("#imgSnap").attr("src",loc);
 
-                            marketChange = -1 * ((currentCap - previousCap)).toFixed(2) + " billion dollars.";
-                            $("#marketChange").html(marketChange);
-                            console.log("Total Coins Parsed: " + coins);
-                            //  marketChange = ((currentCap - previousCap) / 1000000000000).toFixed(2) + " billion dollars.";
-                            //  $("#marketChange").html(marketChange);
-                            if (previousCap > currentCap) { //loss
-                                $("#capCard").addClass(" alert-danger");
-                                $("#cuteMsg").html("Sorry to the bag holders.");
-                                let loc = "https://www.hardforking.com/file/2017/12/sad-bitcoin-1024x568.jpg";
-                                $("#imgSnap").attr("src",loc);
+                                } else { //gain
+                                    $("#capCard").addClass(" alert-success");
+                                    $("#cuteMsg").html("Excellent - congrats to the winners. So much Hopium!");
+                                    let loc = "https://lh3.googleusercontent.com/pw/ACtC-3fmAhA_TBTEglkFqrxt03Kc6R8lKmmNDb5ptKBWUFP0-4NpTaxuXt1VfaCGlIzWnxj6cbA8g6bRAwJz6NwZJA0EHDsi8GDrEuOc_oS7oML1mulxlV11oX2E61D_QemZVJnyhIvbBCgk0ma2oSFQGQlO8w=w495-h496-no?authuser=0";
+                                    $("#imgSnap").attr("src",loc);
+                                }
+                            }) // fetching each coin
+                        
+                        }) // pull response from allcoins
 
-                            } else { //gain
-                                $("#capCard").addClass(" alert-success");
-                                $("#cuteMsg").html("Excellent - congrats to the winners. So much Hopium!");
-                                let loc = "https://lh3.googleusercontent.com/pw/ACtC-3fmAhA_TBTEglkFqrxt03Kc6R8lKmmNDb5ptKBWUFP0-4NpTaxuXt1VfaCGlIzWnxj6cbA8g6bRAwJz6NwZJA0EHDsi8GDrEuOc_oS7oML1mulxlV11oX2E61D_QemZVJnyhIvbBCgk0ma2oSFQGQlO8w=w495-h496-no?authuser=0";
-                                $("#imgSnap").attr("src",loc);
-                            }
-                        }) // fetching each coin
-                      
-                    }) // pull response from allcoins
-
-                } // fetching each page of the market
-                
+                    } // fetching each page of the market
+                    
            
-           })
+             }) // fetch of coins list
 
 
             });
             }
         )
        
-
+ 
 
     
         /*
@@ -169,20 +162,14 @@
         //  (price *  price_change_percentage_7d_in_currency) * supply
         //  calculate previous price - add to previousCap
 
-        // BTC example
-        /*
-        $9,208.93
-        18,430,031
-        $169,720,916,331
-        1.5162813758547298 %
-        0.015162813758547298
-        Diff = $2,649,096,490.915086
-
-        $ 275,732,711,506.2394
-        $ 275,732,714,600.84
-
+      
         NOMICS $275.91B 3.71% (7d())
-        CMC 270.4B 
+       
+        CMC 
+        276905590837
+        262929032911
+        5%
+        13.96 B change
 
         $27,6244,149,057.3995
   
