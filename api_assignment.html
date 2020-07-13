@@ -89,18 +89,23 @@
                                     if ((data[i].market_cap !== null) && (data[i].market_cap !== 0))  { // only bother with coins with market cap
                                         currentCap += data[i].market_cap; //add coin cap to full market cap
                                         if (data[i].price_change_percentage_7d_in_currency != "null"){
-                                            previousCap += (data[i].market_cap / (data[i].price_change_percentage_7d_in_currency/100) ); //add coin cap difference
+                                            if  (data[i].price_change_percentage_7d_in_currency > 0){
+
+                                                previousCap += data[i].market_cap - (data[i].market_cap * (data[i].price_change_percentage_7d_in_currency/100) ); //add coin cap difference
+                                            } else { 
+                                                previousCap += data[i].market_cap + (data[i].market_cap * (data[i].price_change_percentage_7d_in_currency/100) ); //add coin cap difference
+                                            }
                                             console.log(data[i].id + "( Cap )" + data[i].market_cap + " (change) " + (data[i].price_change_percentage_7d_in_currency/100) );
                                         } else {
-                                            previousCap += data[i].marketcap
+                                            previousCap += data[i].marketcap;
                                         }
                                         
                                     }
                                 } // loop through all coins on page
                                
-                              //  console.log("Total Coins Parsed: " + coins);
-                               // console.log("currentCap: " + currentCap);
-                              //  console.log("previousCap: " + previousCap);
+                                console.log("Total Coins Parsed: " + coins);
+                                console.log("currentCap: " + currentCap);
+                                console.log("previousCap: " + previousCap);
                                 
                                 marketChange = ((currentCap - previousCap) / 1000000000000).toFixed(2) + " billion dollars.";
                                 $("#marketChange").html(marketChange);
