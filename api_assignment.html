@@ -107,7 +107,7 @@
                                 console.log("currentCap: " + currentCap);
                                 console.log("previousCap: " + previousCap);
                                 
-                                marketChange = ((currentCap - previousCap) / 1000000000000).toFixed(2) + " billion dollars.";
+                                marketChange = ((currentCap - previousCap) / 1000000000).toFixed(2) + " billion dollars.";
                                 $("#marketChange").html(marketChange);
                                 
                                 if (previousCap > currentCap) { //loss
