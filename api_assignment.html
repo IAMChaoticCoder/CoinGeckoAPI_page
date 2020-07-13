@@ -56,7 +56,7 @@
         var allCoinsUrl = BASE_URL + MKT_ENDPOINT;
         var coins = 0;
 
-     
+        $(document).ready(function () {
 
             
         fetch(coinCountURL) // fetch all coins for page count using 250 per    
@@ -65,16 +65,16 @@
             res => {
 
             res.json().then(pageData => { 
+                if (res.status !== 200) {
+                    $.toaster({ priority :'warning', title :'API Error', message :'Looks like CoinGecko is down - Have Ivan run a stream. '});
+              
+                return;
+            }
+            // else all is good - continue
                 pages = Math.round(pageData.length / 250);
                 console.log("Total pages => " + pages);
-        
-            }
-          
-        }); // fetch of coins list
-
-
                 
-        
+
                 for (p = 1; p <= pages; p++) {
                    // console.log("Page: " + p);
                 
@@ -82,7 +82,7 @@
                         .then(res => {
 
                             res.json().then(data => {
-                               // console.log(data);    // show data from paginated list            
+                                console.log(data);                
                                 for (i = 0; i < data.length; i++) {
                                     coins ++;
                                     
@@ -124,11 +124,12 @@
                     } // fetching each page of the market
                     
            
-           
+             }) // fetch of coins list
 
 
             });
-    
+            }
+        )
        
  
 
